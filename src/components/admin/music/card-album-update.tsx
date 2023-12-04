@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { Music } from '@/types/music'
+import { Media, MediaCreate } from '@/types/music'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
@@ -17,9 +17,13 @@ import FormFieldSelect from '@/components/form-field-select'
 import * as z from 'zod'
 import { Form } from '@/components/ui/form'
 import toast from 'react-hot-toast'
+import mediaService from '@/services/media.service'
+import { useQueryClient, useMutation, useQuery } from 'react-query'
+import { Loader2 } from 'lucide-react'
+import albumService from '@/services/album.service'
 
 interface Props {
-  music: Music
+  music: Media
 }
 
 const formSchema = z.object({
@@ -27,6 +31,19 @@ const formSchema = z.object({
 })
 
 const CardAlbumMusic = ({ music }: Props) => {
+  const queryClient = useQueryClient()
+
+  const { status, mutate } = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: Partial<MediaCreate> }) => mediaService.updateMedia(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['music-details'] })
+      toast.success('update music success')
+    }
+  })
+
+  const { data } = useQuery('my-album', albumService.getMyAlbum)
+  const album = data?.element
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,8 +52,10 @@ const CardAlbumMusic = ({ music }: Props) => {
   })
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
-    toast.success('create music success')
+    mutate({
+      id: music.id,
+      body: { ...values }
+    })
   }
 
   return (
@@ -65,15 +84,15 @@ const CardAlbumMusic = ({ music }: Props) => {
                     name={'albumId'}
                     desc='select album now'
                     label='Choice album'
-                    selects={[
-                      { _id: '001', value: 'music new date' },
-                      { _id: '002', value: 'Charlie Put In VietNam' }
-                    ]}
+                    selects={album ? album.map((album) => ({ _id: album.id, value: album.name })) : []}
                   />
                 </div>
 
                 <DialogFooter>
-                  <Button type='submit'>Save changes</Button>
+                  <Button type='submit' disabled={status === 'loading'}>
+                    {status === 'loading' && <Loader2 className=' animate-spin p-1' />}
+                    Save Changes
+                  </Button>{' '}
                 </DialogFooter>
               </form>
             </Form>

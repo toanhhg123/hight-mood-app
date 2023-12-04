@@ -4,17 +4,20 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form } from '@/components/ui/form'
 import UploadFile from '@/components/upload-file'
-import { Music } from '@/types/music'
+import { handleToastError } from '@/lib'
+import mediaService from '@/services/media.service'
+import { Media, MediaCreate } from '@/types/music'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PenLine, Radio } from 'lucide-react'
+import { Loader2, PenLine, Radio } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import toast from 'react-hot-toast'
+import { useQueryClient, useMutation } from 'react-query'
 import * as z from 'zod'
 
 interface Props {
-  music: Music
+  music: Media
 }
 
 const formSchema = z.object({
@@ -23,6 +26,19 @@ const formSchema = z.object({
 
 const CardMusicSrc = ({ music }: Props) => {
   const [edit, setEdit] = useState(false)
+
+  const queryClient = useQueryClient()
+
+  const { status, mutate } = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: Partial<MediaCreate> }) => mediaService.updateMedia(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['music-details'] })
+      toast.success('update music success')
+    },
+    onError: (e) => {
+      handleToastError(e)
+    }
+  })
 
   const toggleEdit = () => setEdit(!edit)
 
@@ -34,8 +50,10 @@ const CardMusicSrc = ({ music }: Props) => {
   })
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
-    toast.success('create music success')
+    mutate({
+      id: music.id,
+      body: { ...values }
+    })
   }
 
   return (
@@ -85,7 +103,10 @@ const CardMusicSrc = ({ music }: Props) => {
                       <>
                         <UploadFile />
                         <div className='flex justify-end'>
-                          <Button className='mt-2 ml-auto'>Save change</Button>
+                          <Button type='submit' disabled={status === 'loading'}>
+                            {status === 'loading' && <Loader2 className=' animate-spin p-1' />}
+                            Save Changes
+                          </Button>{' '}
                         </div>
                       </>
                     )

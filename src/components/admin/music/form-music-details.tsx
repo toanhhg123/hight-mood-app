@@ -3,15 +3,18 @@ import FormFieldText from '@/components/form-field-text'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form } from '@/components/ui/form'
-import { Music } from '@/types/music'
+import mediaService from '@/services/media.service'
+import { Media, MediaCreate } from '@/types/music'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useMutation, useQueryClient } from 'react-query'
 
 import * as z from 'zod'
 
 interface Props {
-  music: Music
+  music: Media
 }
 
 const formSchema = z.object({
@@ -20,6 +23,14 @@ const formSchema = z.object({
 })
 
 const FormMusicDetails = ({ music }: Props) => {
+  const queryClient = useQueryClient()
+  const { status, mutate } = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: Partial<MediaCreate> }) => mediaService.updateMedia(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['music-details'] })
+      toast.success('update music success')
+    }
+  })
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,8 +39,10 @@ const FormMusicDetails = ({ music }: Props) => {
   })
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
-    toast.success('update music success')
+    mutate({
+      id: music.id,
+      body: { ...values }
+    })
   }
 
   return (
@@ -52,7 +65,10 @@ const FormMusicDetails = ({ music }: Props) => {
             </div>
           </CardContent>
           <CardFooter className='flex justify-end'>
-            <Button type='submit'>Save Changes</Button>
+            <Button type='submit' disabled={status === 'loading'}>
+              {status === 'loading' && <Loader2 className=' animate-spin p-1' />}
+              Save Changes
+            </Button>
           </CardFooter>
         </Card>
       </form>

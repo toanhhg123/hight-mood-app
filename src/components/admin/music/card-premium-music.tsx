@@ -3,15 +3,27 @@ import { Card } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
-import { Music } from '@/types/music'
+import mediaService from '@/services/media.service'
+import { Media, MediaCreate } from '@/types/music'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { useQueryClient, useMutation } from 'react-query'
 
 interface Props {
-  music: Music
+  music: Media
 }
 
 const CardPremiumMusic = ({ music }: Props) => {
+  const queryClient = useQueryClient()
+
+  const { status, mutate } = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: Partial<MediaCreate> }) => mediaService.updateMedia(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['music-details'] })
+      toast.success('update music success')
+    }
+  })
+
   const [dialogConfirm, setDialogConfirm] = useState({ isOpen: false, title: '' })
 
   const handleToggleDialog = (title: string = '') => {
@@ -19,8 +31,10 @@ const CardPremiumMusic = ({ music }: Props) => {
   }
 
   const handlePremium = () => {
-    toast.success('change status success')
-    handleToggleDialog()
+    mutate({
+      id: music.id,
+      body: { isPremium: !music.isPremium }
+    })
   }
 
   return (
@@ -40,6 +54,7 @@ const CardPremiumMusic = ({ music }: Props) => {
           desc='you will definitely change the status of the song '
           onContinue={handlePremium}
           type='default'
+          loading={status === 'loading'}
           onOpenChange={(open) => setDialogConfirm({ isOpen: open, title: '' })}
         />
 

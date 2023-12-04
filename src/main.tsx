@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from 'react-query/devtools'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './globals.css'
+import { AuthContextProvider } from './contexts/auth.context'
 
 export const queryClient = new QueryClient()
 
@@ -15,7 +16,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <Toaster />
-        <App />
+        <AuthContextProvider>
+          <App />
+        </AuthContextProvider>
         <ReactQueryDevtools initialIsOpen={true} />
       </QueryClientProvider>
     </BrowserRouter>

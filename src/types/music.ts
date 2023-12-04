@@ -8,10 +8,10 @@ export interface Album {
   image: string
 
   author?: User
-  medias?: Music[]
+  medias?: Media[]
 }
 
-export interface Music {
+export interface Media {
   id: string
   name: string
   desc: string
@@ -22,4 +22,13 @@ export interface Music {
   albumId?: string
   author?: User
   album?: Album
+}
+
+export interface MediaCreate {
+  name: string
+  src: string
+  image: string
+  desc: string
+  isPremium: boolean
+  albumId?: string
 }

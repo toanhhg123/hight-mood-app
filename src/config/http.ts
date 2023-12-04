@@ -1,3 +1,5 @@
+import { KEY_AUTH_LOCAL } from '@/contexts/auth.context'
+import localStore from '@/utils/localstore'
 import axios, { AxiosInstance } from 'axios'
 
 export class Http {
@@ -6,6 +8,17 @@ export class Http {
     this.instance = axios.create({
       baseURL: 'http://localhost:8080'
     })
+
+    this.instance.interceptors.request.use(
+      (config) => {
+        const token = localStore.getStringLocal(KEY_AUTH_LOCAL)
+
+        if (token) config.headers.Authorization = `Bearer ${token}`
+
+        return config
+      },
+      (error) => Promise.reject(error)
+    )
   }
 }
 

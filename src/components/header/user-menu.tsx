@@ -11,8 +11,10 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import useAuth from '@/hooks/useAuth'
 
 const UserMenu = () => {
+  const { logout } = useAuth()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -43,7 +45,11 @@ const UserMenu = () => {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            logout()
+          }}
+        >
           <LogOut className='mr-2 h-4 w-4' />
           <span>Log out</span>
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

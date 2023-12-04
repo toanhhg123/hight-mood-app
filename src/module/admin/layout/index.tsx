@@ -3,10 +3,11 @@ import SideBar from '@/components/sidebar'
 import { ScrollArea } from '@radix-ui/react-scroll-area'
 import { Outlet } from 'react-router-dom'
 import routes from '../routes'
+import PrivateRouter from '@/components/private-route'
 
 const Layout = () => {
   return (
-    <>
+    <PrivateRouter roles={[]}>
       <Header />
       <div className='mt-16 flex'>
         {/* side bar */}
@@ -15,7 +16,7 @@ const Layout = () => {
           <Outlet />
         </ScrollArea>
       </div>
-    </>
+    </PrivateRouter>
   )
 }
 
