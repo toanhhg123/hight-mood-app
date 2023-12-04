@@ -1,8 +1,9 @@
-import { LucideLayout, Music, User2, UserCheck2 } from 'lucide-react'
+import { Album, LucideLayout, Music, User2, UserCheck2 } from 'lucide-react'
 import Dashboard from './pages/dashboard'
 import MusicPage from './pages/music'
 import MusicDetails from './pages/music-details'
 import Users from './pages/user'
+import AlbumPageAdmin from './pages/album'
 
 export default [
   {
@@ -35,5 +36,11 @@ export default [
     label: 'Artist',
     element: <MusicDetails />,
     hidden: true
+  },
+  {
+    href: '/admin/album',
+    icon: <Album className='w-5' />,
+    label: 'Album',
+    element: <AlbumPageAdmin />
   }
 ]

@@ -1,5 +1,5 @@
 import { Media } from '@/types/music'
-import { Card, CardContent, CardHeader } from '../../ui/card'
+import { Card, CardContent, CardHeader } from '../ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useNavigate } from 'react-router-dom'
 import { IMAGE_EMPTY } from '@/assets/image-link'

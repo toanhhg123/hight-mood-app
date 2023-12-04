@@ -28,7 +28,7 @@ export default function UserAuthForm({ className, ...props }: UserAuthFormProps)
     },
     onSuccess: (data) => {
       loginSuccess(data.element.accessToken)
-      navigate('/admin/dashboard')
+      navigate('/')
       toast.success('login success')
     }
   })

@@ -2,14 +2,16 @@ import { User } from './user'
 
 export interface Album {
   id: string
-  name: string
   authorId: string
+  name: string
   desc: string
   image: string
 
   author?: User
   medias?: Media[]
 }
+
+export type AlbumCreate = Pick<Album, 'name' | 'image' | 'desc'>
 
 export interface Media {
   id: string

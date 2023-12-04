@@ -63,6 +63,11 @@ const CardMusicSrc = ({ music }: Props) => {
           <div className='  text-sm font-semibold flex gap-1 items-center'>
             <Radio />
             Music Link
+            <div className=''>
+              <audio className='h-8' controls>
+                <source src={music.src} />
+              </audio>
+            </div>
           </div>
 
           <Button onClick={toggleEdit} variant={'outline'} size={'icon'}>
@@ -115,9 +120,11 @@ const CardMusicSrc = ({ music }: Props) => {
               />
             </div>
           ) : (
-            <div className='rounded-sm p-2 flex  bg-gray-200 items-center flex-1 truncate text-sm text-gray-700'>
-              <p className='truncate'>{music.src || 'no update'}</p>
-            </div>
+            <>
+              <div className='rounded-sm p-2 flex bg-gray-200 items-center flex-1 truncate text-sm text-gray-700'>
+                <p className='truncate'>{music.src || 'no update'}</p>
+              </div>
+            </>
           )}
         </div>
       </CardContent>
