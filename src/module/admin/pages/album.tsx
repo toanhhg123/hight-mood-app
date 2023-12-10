@@ -8,9 +8,7 @@ import { useQuery } from 'react-query'
 const AlbumPageAdmin = () => {
   const { isFetching, isLoading, data } = useQuery({
     queryKey: ['album'],
-    queryFn: albumService.getMyAlbum,
-    keepPreviousData: true,
-    staleTime: 1000 * 1000
+    queryFn: albumService.getMyAlbum
   })
 
   return (

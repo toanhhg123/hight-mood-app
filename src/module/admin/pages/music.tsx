@@ -8,9 +8,7 @@ import { useQuery } from 'react-query'
 const MusicPage = () => {
   const { isFetching, isLoading, data } = useQuery({
     queryKey: ['music'],
-    queryFn: mediaService.getMedias,
-    keepPreviousData: true,
-    staleTime: 1000
+    queryFn: mediaService.getMedias
   })
 
   return (

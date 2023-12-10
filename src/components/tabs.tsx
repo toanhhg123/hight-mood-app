@@ -3,11 +3,13 @@ import { ReactNode } from 'react'
 
 interface Props {
   tabs: { value: string; component: ReactNode; label: string }[]
+  value?: string
+  onValueChange?: (value: string) => void
 }
 
-export default function Tabs({ tabs }: Props) {
+export default function Tabs({ tabs, value, onValueChange }: Props) {
   return (
-    <TabsDefault defaultValue={tabs.at(0)?.value} className=''>
+    <TabsDefault value={value || tabs.at(0)?.value} onValueChange={onValueChange} className=''>
       <TabsList className='grid w-full grid-cols-2'>
         {tabs.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>

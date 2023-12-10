@@ -7,6 +7,7 @@ import { Form } from '@/components/ui/form'
 import UploadFile from '@/components/upload-file'
 import { handleToastError } from '@/lib'
 import mediaService from '@/services/media.service'
+import uploadService from '@/services/upload.service'
 import { Media, MediaCreate } from '@/types/music'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Copy, Loader2, PenLine } from 'lucide-react'
@@ -15,6 +16,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useQueryClient, useMutation } from 'react-query'
 import { z } from 'zod'
+import { Badge } from '../ui/badge'
 
 interface Props {
   music: Media
@@ -26,6 +28,8 @@ const formSchema = z.object({
 
 const CardMusicImage = ({ music }: Props) => {
   const [edit, setEdit] = useState(false)
+  const [valueTab, setValueTab] = useState('form-text')
+  const [file, setFile] = useState<File>()
 
   const queryClient = useQueryClient()
 
@@ -39,6 +43,20 @@ const CardMusicImage = ({ music }: Props) => {
       handleToastError(e)
     }
   })
+
+  const { status: statusUpload, mutate: mutateUpload } = useMutation({
+    mutationFn: ({ file }: { file: File }) => uploadService.upload(file),
+    onSuccess: (data) => {
+      mutate({
+        id: music.id,
+        body: { image: data.data.url }
+      })
+    },
+    onError: (e) => {
+      handleToastError(e)
+    }
+  })
+
   const toggleEdit = () => setEdit(!edit)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -53,6 +71,12 @@ const CardMusicImage = ({ music }: Props) => {
       id: music.id,
       body: { ...values }
     })
+  }
+
+  const handleUploadFile = async () => {
+    if (!file) return toast.error('please choice file ?')
+
+    mutateUpload({ file })
   }
 
   return (
@@ -83,6 +107,8 @@ const CardMusicImage = ({ music }: Props) => {
         {edit && (
           <div className='w-full my-2'>
             <Tabs
+              value={valueTab}
+              onValueChange={setValueTab}
               tabs={[
                 {
                   value: 'form-text',
@@ -109,12 +135,14 @@ const CardMusicImage = ({ music }: Props) => {
                   label: 'Form Upload',
                   component: (
                     <>
-                      <UploadFile />
-                      <div className='flex justify-end'>
-                        <Button className='mt-4' type='submit' disabled={status === 'loading'}>
-                          {status === 'loading' && <Loader2 className=' animate-spin p-1' />}
+                      <UploadFile onChangeFile={setFile} />
+                      <div className='flex justify-end mt-4 gap-4'>
+                        {file && <Badge variant={'outline'}>{file?.name}</Badge>}
+                        <Button onClick={handleUploadFile} type='button'>
+                          {status === 'loading' ||
+                            (statusUpload === 'loading' && <Loader2 className=' animate-spin p-1' />)}
                           Save Changes
-                        </Button>{' '}
+                        </Button>
                       </div>
                     </>
                   )

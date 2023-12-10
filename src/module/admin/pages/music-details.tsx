@@ -13,16 +13,19 @@ import { useParams } from 'react-router-dom'
 const MusicDetails = () => {
   const { id } = useParams()
 
-  const { isLoading, isFetching, data } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ['music-details', id],
     queryFn: () => mediaService.findById(id!),
     onError: (error) => {
       handleToastError(error)
     },
-    staleTime: 10 * 1000
+    cacheTime: Infinity,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+    refetchInterval: false
   })
 
-  if (isLoading || isFetching)
+  if (isLoading)
     return (
       <div className='h-screen'>
         <SkeletonLoading />

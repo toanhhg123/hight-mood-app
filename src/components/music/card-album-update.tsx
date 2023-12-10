@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -41,7 +42,13 @@ const CardAlbumMusic = ({ music }: Props) => {
     }
   })
 
-  const { data } = useQuery('my-album', albumService.getMyAlbum)
+  const { data } = useQuery('my-album', {
+    queryFn: albumService.getMyAlbum,
+    cacheTime: Infinity,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+    refetchInterval: false
+  })
   const album = data?.element
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,10 +96,12 @@ const CardAlbumMusic = ({ music }: Props) => {
                 </div>
 
                 <DialogFooter>
-                  <Button type='submit' disabled={status === 'loading'}>
-                    {status === 'loading' && <Loader2 className=' animate-spin p-1' />}
-                    Save Changes
-                  </Button>{' '}
+                  <DialogClose>
+                    <Button type='submit' disabled={status === 'loading'}>
+                      {status === 'loading' && <Loader2 className=' animate-spin p-1' />}
+                      Save Changes
+                    </Button>
+                  </DialogClose>
                 </DialogFooter>
               </form>
             </Form>

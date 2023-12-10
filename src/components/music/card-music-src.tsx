@@ -6,6 +6,7 @@ import { Form } from '@/components/ui/form'
 import UploadFile from '@/components/upload-file'
 import { handleToastError } from '@/lib'
 import mediaService from '@/services/media.service'
+import uploadService from '@/services/upload.service'
 import { Media, MediaCreate } from '@/types/music'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, PenLine, Radio } from 'lucide-react'
@@ -13,8 +14,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import toast from 'react-hot-toast'
-import { useQueryClient, useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import * as z from 'zod'
+import { Badge } from '../ui/badge'
 
 interface Props {
   music: Media
@@ -26,6 +28,8 @@ const formSchema = z.object({
 
 const CardMusicSrc = ({ music }: Props) => {
   const [edit, setEdit] = useState(false)
+  const [file, setFile] = useState<File>()
+  const [valueTab, setValueTab] = useState('form-text')
 
   const queryClient = useQueryClient()
 
@@ -34,6 +38,19 @@ const CardMusicSrc = ({ music }: Props) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['music-details'] })
       toast.success('update music success')
+    },
+    onError: (e) => {
+      handleToastError(e)
+    }
+  })
+
+  const { status: statusUpload, mutate: mutateUpload } = useMutation({
+    mutationFn: ({ file }: { file: File }) => uploadService.upload(file),
+    onSuccess: (data) => {
+      mutate({
+        id: music.id,
+        body: { src: data.data.url }
+      })
     },
     onError: (e) => {
       handleToastError(e)
@@ -56,6 +73,12 @@ const CardMusicSrc = ({ music }: Props) => {
     })
   }
 
+  const handleUploadFile = async () => {
+    if (!file) return toast.error('please choice file ?')
+
+    mutateUpload({ file })
+  }
+
   return (
     <Card className=''>
       <CardHeader className='pb-2 flex flex-row items-center justify-between text-gray-500'>
@@ -70,7 +93,7 @@ const CardMusicSrc = ({ music }: Props) => {
             </div>
           </div>
 
-          <Button onClick={toggleEdit} variant={'outline'} size={'icon'}>
+          <Button onClick={toggleEdit} type='button' variant={'outline'} size={'icon'}>
             <PenLine />
           </Button>
         </div>
@@ -80,6 +103,8 @@ const CardMusicSrc = ({ music }: Props) => {
           {edit ? (
             <div className='w-full'>
               <Tabs
+                value={valueTab}
+                onValueChange={setValueTab}
                 tabs={[
                   {
                     value: 'form-text',
@@ -106,12 +131,14 @@ const CardMusicSrc = ({ music }: Props) => {
                     label: 'Form Upload',
                     component: (
                       <>
-                        <UploadFile />
-                        <div className='flex justify-end'>
-                          <Button type='submit' disabled={status === 'loading'}>
-                            {status === 'loading' && <Loader2 className=' animate-spin p-1' />}
+                        <UploadFile onChangeFile={setFile} />
+                        <div className='flex justify-end mt-4 gap-4'>
+                          {file && <Badge variant={'outline'}>{file?.name}</Badge>}
+                          <Button onClick={handleUploadFile} type='button'>
+                            {status === 'loading' ||
+                              (statusUpload === 'loading' && <Loader2 className=' animate-spin p-1' />)}
                             Save Changes
-                          </Button>{' '}
+                          </Button>
                         </div>
                       </>
                     )
