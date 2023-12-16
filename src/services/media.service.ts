@@ -6,6 +6,10 @@ export class MediaService {
     return (await http.get<ResponseSuccess<Media[]>>('/media')).data
   }
 
+  async getMyMedias() {
+    return (await http.get<ResponseSuccess<Media[]>>('/media/my-music/me')).data
+  }
+
   async findById(id: string) {
     return (await http.get<ResponseSuccess<Media>>(`/media/${id}`)).data
   }

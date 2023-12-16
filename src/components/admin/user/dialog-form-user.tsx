@@ -5,11 +5,10 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger
+  DialogTitle
 } from '@/components/ui/dialog'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, PlusCircle } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 
 import FormFieldBoolean from '@/components/form-field-boolean'
@@ -18,40 +17,51 @@ import FormFieldSelect from '@/components/form-field-select'
 import { Form } from '@/components/ui/form'
 import { handleToastError } from '@/lib'
 import userService from '@/services/user.service'
-import { ERole, UserCreate } from '@/types/user'
+import { ERole, User, UserCreate } from '@/types/user'
 import toast from 'react-hot-toast'
 import { useMutation, useQueryClient } from 'react-query'
 import * as z from 'zod'
 
+interface Props {
+  initUser?: User
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  type: 'create' | 'update'
+}
+
 const formSchema = z.object({
   email: z.string().email().min(1),
-  password: z.string().min(4),
   isPremium: z.boolean().optional(),
   roleCode: z.nativeEnum(ERole),
   firstName: z.string().optional(),
   phone: z.string().optional()
 })
 
-const CreateUser = () => {
+const FormUser = ({ initUser, open, onOpenChange, type }: Props) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      isPremium: false,
       email: '',
-
-      password: '',
+      isPremium: false,
       roleCode: ERole.USER,
-      firstName: ''
+      firstName: '',
+      phone: '',
+      ...initUser
     }
   })
 
   const client = useQueryClient()
 
   const { mutate, status } = useMutation({
-    mutationFn: () => userService.createUser(form.getValues() as UserCreate),
+    mutationFn: async () => {
+      if (type === 'create') return userService.createUser(form.getValues() as UserCreate)
+      if (initUser) return userService.updateUser(initUser.id, form.getValues() as UserCreate)
+      return
+    },
     onSuccess: () => {
-      toast.success('create music success')
+      toast.success(type === 'create' ? 'create music success' : 'update user success')
       client.invalidateQueries('users')
+      onOpenChange(false)
     },
     onError: (e) => {
       handleToastError(e)
@@ -63,13 +73,7 @@ const CreateUser = () => {
   }
 
   return (
-    <Dialog onOpenChange={(open) => open && form.reset()}>
-      <DialogTrigger asChild>
-        <Button className='flex gap-2'>
-          <PlusCircle className='w-[14px]' />
-          New User
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[425px]'>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -83,7 +87,6 @@ const CreateUser = () => {
               <FormFieldInput name='phone' label='Phone' form={form} />
 
               <FormFieldInput name='email' label='Email' form={form} />
-              <FormFieldInput name='password' inputType='password' label='Password' form={form} />
               <FormFieldSelect
                 name='roleCode'
                 label='Role'
@@ -110,4 +113,4 @@ const CreateUser = () => {
   )
 }
 
-export default CreateUser
+export default FormUser

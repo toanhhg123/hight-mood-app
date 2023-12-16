@@ -11,12 +11,14 @@ export interface Role {
 
 export interface User {
   id: string
-  firstName: string
-  lastName: string
+  firstName?: string
+  lastName?: string
   email: string
-  phone: string
+  phone?: string
   password: string
   isPremium: boolean
   roleCode: ERole
   role?: Role
 }
+
+export type UserCreate = Omit<User, 'id' | 'role'>

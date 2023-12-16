@@ -18,9 +18,9 @@ import { MoreHorizontal } from 'lucide-react'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
 
-const Users = () => {
-  const { data } = useQuery('users', {
-    queryFn: userService.getUser,
+const Singers = () => {
+  const { data } = useQuery('singers', {
+    queryFn: userService.getSingers,
     staleTime: 100000
   })
 
@@ -92,4 +92,4 @@ const Users = () => {
   )
 }
 
-export default Users
+export default Singers

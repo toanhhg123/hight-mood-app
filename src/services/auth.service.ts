@@ -9,6 +9,10 @@ export class UserService {
   async login(email: string, password: string) {
     return (await http.post<ResponseSuccess<{ accessToken: string }>>('/auth/login', { email, password })).data
   }
+
+  async changePassword(password: string) {
+    return (await http.post<ResponseSuccess<{ accessToken: string }>>(`/auth/change-password`, { password })).data
+  }
 }
 
 export default new UserService()
