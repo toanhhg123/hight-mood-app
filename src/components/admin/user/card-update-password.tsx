@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { User } from '@/types/user'
 
 import { Button } from '@/components/ui/button'
 import { DialogFooter } from '@/components/ui/dialog'
@@ -10,12 +9,10 @@ import { useForm } from 'react-hook-form'
 import FormFieldInput from '@/components/form-field-input'
 import { Form } from '@/components/ui/form'
 import { handleToastError } from '@/lib'
-import userService from '@/services/user.service'
-import { UserCreate } from '@/types/user'
+import authService from '@/services/auth.service'
 import toast from 'react-hot-toast'
 import { useMutation, useQueryClient } from 'react-query'
 import * as z from 'zod'
-import authService from '@/services/auth.service'
 
 const formSchema = z.object({
   password: z.string().min(4)
