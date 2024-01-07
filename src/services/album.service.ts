@@ -13,6 +13,10 @@ export class MediaService {
   async updateAlbum(id: string, album: Partial<AlbumCreate>) {
     return (await http.patch<ResponseSuccess<Album>>(`/album/${id}`, album)).data
   }
+
+  async delete(id: string) {
+    return (await http.delete<ResponseSuccess<Album>>(`/album/${id}`)).data
+  }
 }
 
 export default new MediaService()

@@ -21,6 +21,10 @@ export class MediaService {
   async updateMedia(id: string, media: Partial<MediaCreate>) {
     return (await http.patch<ResponseSuccess<Media>>(`/media/${id}`, media)).data
   }
+
+  async deleteMusic(id: string) {
+    return (await http.delete<ResponseSuccess<Media>>(`/media/${id}`)).data
+  }
 }
 
 export default new MediaService()
