@@ -34,3 +34,11 @@ export interface MediaCreate {
   isPremium: boolean
   albumId?: string
 }
+
+export interface MediaType {
+  id: string
+  name: string
+  image: string
+  note: string
+  medias?: Media[]
+}

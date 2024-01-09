@@ -6,7 +6,7 @@ export class Http {
   instance!: AxiosInstance
   constructor() {
     this.instance = axios.create({
-      baseURL: 'http://localhost:8080'
+      baseURL: 'http://14.225.206.52:8080'
     })
 
     this.instance.interceptors.request.use(
@@ -26,6 +26,18 @@ export interface ResponseSuccess<T> {
   status: number
   message: string
   element: T
+}
+
+export interface IResponsePagination<T> {
+  status: number
+  message: string
+  element: {
+    rows: T[]
+    limit: number
+    page: number
+    skip: number
+    total: number
+  }
 }
 
 const http = new Http().instance

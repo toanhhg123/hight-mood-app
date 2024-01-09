@@ -1,4 +1,4 @@
-import { Album, LucideLayout, Music, Music2, User2, UserCheck2, UserCircle2Icon } from 'lucide-react'
+import { Album, BookTypeIcon, LucideLayout, Music, Music2, User2, UserCheck2, UserCircle2Icon } from 'lucide-react'
 import Dashboard from './pages/dashboard'
 import MusicPage from './pages/music'
 import MusicDetails from './pages/music-details'
@@ -7,6 +7,7 @@ import AlbumPageAdmin from './pages/album'
 import Profile from './pages/profile'
 import MyMusic from './pages/my-music'
 import Singers from './pages/singer'
+import MediaPagesAdmin from './pages/mediaTypes'
 
 export default [
   {
@@ -44,6 +45,12 @@ export default [
     icon: <UserCircle2Icon className='w-5' />,
     label: 'Singers',
     element: <Singers />
+  },
+  {
+    href: '/admin/mediaType',
+    icon: <BookTypeIcon className='w-5' />,
+    label: 'Media Types',
+    element: <MediaPagesAdmin />
   },
   {
     href: '/admin/music/details/:id',
