@@ -1,9 +1,9 @@
-import http, { IResponsePagination, ResponseSuccess } from '@/config/http'
+import http, { ResponseSuccess } from '@/config/http'
 import { Media, MediaCreate } from '@/types/music'
 
 export class MediaService {
   async getMedias() {
-    return (await http.get<IResponsePagination<Media[]>>('/media')).data
+    return (await http.get<ResponseSuccess<Media[]>>('/media')).data
   }
 
   async getMyMedias() {
