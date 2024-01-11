@@ -6,7 +6,7 @@ export class Http {
   instance!: AxiosInstance
   constructor() {
     this.instance = axios.create({
-      baseURL: 'http://localhost:8080'
+      baseURL: 'http://14.225.206.52:8080'
     })
 
     this.instance.interceptors.request.use(
