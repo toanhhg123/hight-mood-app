@@ -1,3 +1,4 @@
+import MediaTypeSelection from '@/components/music/MediaTypesSelection'
 import CardAlbumMusic from '@/components/music/card-album-update'
 import CardMusicImage from '@/components/music/card-music-image'
 import CardMusicSrc from '@/components/music/card-music-src'
@@ -7,7 +8,7 @@ import FormMusicDetails from '@/components/music/form-music-details'
 import SkeletonLoading from '@/components/skeleton-loading'
 import { handleToastError } from '@/lib'
 import mediaService from '@/services/media.service'
-import { Album, Crown, Image, LayoutDashboard, PlayCircleIcon } from 'lucide-react'
+import { Album, BookPlus, Crown, Image, LayoutDashboard, PlayCircleIcon } from 'lucide-react'
 import { useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 
@@ -72,6 +73,14 @@ const MusicDetails = () => {
               <h3>Album Music</h3>
             </div>
             <CardAlbumMusic music={music} />
+          </div>
+
+          <div>
+            <div className='flex gap-2 text-lg text-sky-700 font-semibold mb-4'>
+              <BookPlus />
+              <h3>Media Types</h3>
+            </div>
+            <MediaTypeSelection music={music} />
           </div>
 
           <div>

@@ -1,6 +1,7 @@
 import { IMAGE_EMPTY } from '@/assets/image-link'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { MediaType } from '@/types/music'
+import MediaTypeActions from './action-media-type'
 
 type Props = {
   mediaType: MediaType
@@ -26,7 +27,9 @@ const CardMediaType = ({ mediaType }: Props) => {
           <h6 className='font-medium truncate'>{mediaType.name}</h6>
         </div>
       </CardContent>
-      <CardFooter className='p-2 gap-2'></CardFooter>
+      <CardFooter className='p-2 gap-2'>
+        <MediaTypeActions media={mediaType} />
+      </CardFooter>
     </Card>
   )
 }
