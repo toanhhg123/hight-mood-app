@@ -9,7 +9,7 @@ import mediaService from '@/services/media.service'
 import uploadService from '@/services/upload.service'
 import { Media, MediaCreate } from '@/types/music'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, PenLine, Radio } from 'lucide-react'
+import { Loader2, PenLine, PlayCircle, TimerResetIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -17,13 +17,15 @@ import toast from 'react-hot-toast'
 import { useMutation, useQueryClient } from 'react-query'
 import * as z from 'zod'
 import { Badge } from '../ui/badge'
+import { formatMMSS } from '@/lib/utils'
 
 interface Props {
   music: Media
 }
 
 const formSchema = z.object({
-  src: z.string().min(1)
+  src: z.string().min(1),
+  duration: z.number()
 })
 
 const CardMusicSrc = ({ music }: Props) => {
@@ -62,7 +64,8 @@ const CardMusicSrc = ({ music }: Props) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      src: music.src || ''
+      src: music.src || '',
+      duration: music.duration || 0
     }
   })
 
@@ -73,30 +76,54 @@ const CardMusicSrc = ({ music }: Props) => {
     })
   }
 
+  const handleResetDuration = () => {
+    const audio = new Audio(music.src)
+    audio.onloadedmetadata = () => {
+      const duration = Number(audio.duration.toFixed())
+      mutate({
+        id: music.id,
+        body: { duration }
+      })
+      form.setValue('duration', duration)
+    }
+
+    audio.onerror = () => {
+      toast.error('error')
+    }
+  }
+
   const handleUploadFile = async () => {
     if (!file) return toast.error('please choice file ?')
-
     mutateUpload({ file })
   }
 
+  const duration = form.getValues('duration')
+
   return (
     <Card className=''>
-      <CardHeader className='pb-2 flex flex-row items-center justify-between text-gray-500'>
-        <div className='flex items-center justify-between w-full'>
-          <div className='  text-sm font-semibold flex gap-1 items-center'>
-            <Radio />
-            Music Link
-            <div className=''>
-              <audio className='h-8' controls>
-                <source src={music.src} />
-              </audio>
+      <CardHeader className='my-2'>
+        <div className='flex justify-between items-center'>
+          <div className='flex items-center'>
+            <Button size={'icon'}>
+              <PlayCircle />
+            </Button>
+            <div className='ml-2  text-gray-500'>
+              <h3 className=' font-medium'>{music.name || 'no update'}</h3>
+              <span className='text-sm'>duration: {formatMMSS(duration)}</span>
             </div>
           </div>
-
-          <Button onClick={toggleEdit} type='button' variant={'outline'} size={'icon'}>
-            <PenLine />
-          </Button>
+          <div className='flex gap-2'>
+            <Button onClick={toggleEdit} type='button' variant={'outline'} size={'icon'}>
+              <PenLine />
+            </Button>
+            <Button onClick={handleResetDuration} type='button' variant={'secondary'} size={'icon'}>
+              <TimerResetIcon />
+            </Button>
+          </div>
         </div>
+        <audio className='h-8 w-full' controls>
+          <source src={music.src} className='w-full' />
+        </audio>
       </CardHeader>
       <CardContent className='pb-4'>
         <div className='flex gap-2 items-center w-full'>
@@ -131,7 +158,22 @@ const CardMusicSrc = ({ music }: Props) => {
                     label: 'Form Upload',
                     component: (
                       <>
-                        <UploadFile onChangeFile={setFile} />
+                        <UploadFile
+                          onChangeFile={(file) => {
+                            if (file) {
+                              const reader = new FileReader()
+                              reader.readAsDataURL(file)
+                              reader.onload = function () {
+                                const audio = new Audio(reader.result?.toString())
+                                audio.onloadedmetadata = () => {
+                                  form.setValue('duration', Number(audio.duration.toFixed()))
+                                }
+                              }
+                            }
+
+                            setFile(file)
+                          }}
+                        />
                         <div className='flex justify-end mt-4 gap-4'>
                           {file && <Badge variant={'outline'}>{file?.name}</Badge>}
                           <Button onClick={handleUploadFile} type='button'>

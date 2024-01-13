@@ -50,9 +50,9 @@ export default function UserAuthForm({ className, ...props }: UserAuthFormProps)
   }, [navigate, token])
 
   return (
-    <div className={cn('grid gap-6 items-center justify-center h-screen', className)} {...props}>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className={cn('grid gap-6 items-center justify-center h-screen', className)} {...props}>
           <Card className='w-[500px]'>
             <CardHeader>
               <CardTitle>Login </CardTitle>
@@ -82,9 +82,9 @@ export default function UserAuthForm({ className, ...props }: UserAuthFormProps)
               </Button>
             </CardFooter>
           </Card>
-        </form>
-      </Form>
-    </div>
+        </div>
+      </form>
+    </Form>
   )
 }
 
